@@ -1,7 +1,16 @@
 <script lang="ts">
     import logo from "./assets/llfs.svg";
     import getParameters from "./lib/parameters";
+    import { clientId } from "../config.json";
     const parameters = getParameters();
+
+    // Create Spotify auth link
+    const authArgs = new URLSearchParams();
+    authArgs.append("client_id", clientId);
+    authArgs.append("response_type", "token");
+    authArgs.append("show_dialog", "false");
+    authArgs.append("redirect_uri", "http://localhost:3000/");
+    const auth_url = "https://accounts.spotify.com/authorize?" + authArgs.toString();
 </script>
 
 {#if parameters}
@@ -11,7 +20,7 @@
         <article>
             <img src={logo} class="logo" alt="Live Lyrics for Spotify logo" />
             <h1>Welcome to Live Lyrics for Spotify</h1>
-            <a href="">Sign in with Spotify</a>
+            <a href={auth_url}>Sign in with Spotify</a>
         </article>
     </main>
 {/if}
@@ -58,5 +67,17 @@
 
     h1 {
         font-size: 2.5em;
+        margin-block: 0.5em;
+    }
+
+    a {
+        font-size: 1.5em;
+        color: black;
+        text-decoration: none;
+        border: none;
+        border-radius: 0.5em;
+        background-color: #B0DB43;
+        padding: 0.5em;
+        font-weight: bold;
     }
 </style>
