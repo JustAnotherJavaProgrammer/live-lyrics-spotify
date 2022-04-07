@@ -1,65 +1,62 @@
 <script lang="ts">
-  import logo from './assets/LLFS.svg'
-  import Counter from './lib/Counter.svelte'
+    import logo from "./assets/llfs.svg";
+    import getParameters from "./lib/parameters";
+    const parameters = getParameters();
 </script>
 
-<main>
-  <img src={logo} alt="Svelte Logo" />
-  <h1>Live Lyrics for Spotify</h1>
-
-  <Counter />
-
-  <p>
-    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
-    apps.
-  </p>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
-    the officially supported framework, also powered by Vite!
-  </p>
-</main>
+{#if parameters}
+    <span>{parameters}</span>
+{:else}
+    <main class="flex-container">
+        <article>
+            <img src={logo} class="logo" alt="Live Lyrics for Spotify logo" />
+            <h1>Welcome to Live Lyrics for Spotify</h1>
+            <a href="">Sign in with Spotify</a>
+        </article>
+    </main>
+{/if}
 
 <style>
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
+    :root {
+        font-family: Inter, Helvetica, Arial, Roboto, sans-serif;
+        background: url("/llfs_blurry.svg") #db2763 no-repeat center/cover;
+        color: #ffffff;
+    }
 
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
+    :global(body) {
+        margin: 0;
+        min-height: 100vh;
+    }
 
-  img {
-    height: 16rem;
-    width: 16rem;
-  }
+    :global(.info, h1, h2, h3, h4, h5, h6) {
+        font-family: Inter, Helvetica, Arial, Roboto, sans-serif;
+        font-weight: 600;
+    }
 
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-  p {
-    max-width: 14rem;
-    margin: 1rem auto;
-    line-height: 1.35;
-  }
+    main.flex-container {
+        min-height: 100vh;
+    }
 
-  @media (min-width: 480px) {
+    .logo {
+        width: 10em;
+        height: 10em;
+        display: block;
+    }
+
+    article {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
     h1 {
-      max-width: none;
+        font-size: 2.5em;
     }
-
-    p {
-      max-width: none;
-    }
-  }
 </style>
