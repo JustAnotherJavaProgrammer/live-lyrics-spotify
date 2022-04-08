@@ -1,8 +1,11 @@
 <script lang="ts">
     import logo from "./assets/llfs.svg";
-    import getParameters from "./lib/parameters";
+    import getParameters, { AuthParameters } from "./lib/parameters";
     import { clientId } from "../config.json";
-    const parameters = getParameters();
+    import { fade } from "svelte/transition";
+    import { getContext, hasContext, setContext } from "svelte";
+    import { writable } from "svelte/store";
+    import Player from "./lib/Player.svelte";
 
     // Create Spotify auth link
     const authArgs = new URLSearchParams();
@@ -10,13 +13,18 @@
     authArgs.append("response_type", "token");
     authArgs.append("show_dialog", "false");
     authArgs.append("redirect_uri", "http://localhost:3000/");
+    authArgs.append("scope", "user-modify-playback-state user-read-playback-state user-library-modify user-read-currently-playing user-library-read");
     const auth_url = "https://accounts.spotify.com/authorize?" + authArgs.toString();
+    const parameters = writable(getParameters());
+    setContext("auth_data", parameters);
+    let params: AuthParameters | void;
+    parameters.subscribe((p) => (params = p));
 </script>
 
-{#if parameters}
-    <span>{parameters}</span>
+{#if params}
+    <Player />
 {:else}
-    <main class="flex-container">
+    <main class="flex-container" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250, delay: 0 }}>
         <article>
             <img src={logo} class="logo" alt="Live Lyrics for Spotify logo" />
             <h1>Welcome to Live Lyrics for Spotify</h1>
@@ -76,7 +84,7 @@
         text-decoration: none;
         border: none;
         border-radius: 0.5em;
-        background-color: #B0DB43;
+        background-color: #b0db43;
         padding: 0.5em;
         font-weight: bold;
     }
