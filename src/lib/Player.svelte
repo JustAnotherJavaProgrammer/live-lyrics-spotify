@@ -30,7 +30,7 @@ import Lyrics from "./Lyrics.svelte";
             console.error(err);
             auth_data.set(undefined);
         }
-        const remainingTime = remainingPlaybackTime();
+        const remainingTime = remainingPlaybackTime(playbackState);
         interval = window.setTimeout(updatePlaybackState, Math.min(remainingTime > 0 ? remainingTime : 5000, 5000));
     }
 </script>
@@ -63,6 +63,7 @@ import Lyrics from "./Lyrics.svelte";
         flex-direction: column;
         justify-content: stretch;
         align-items: stretch;
+        height: 100%;
     }
 
     header {
