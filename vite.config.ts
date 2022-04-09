@@ -16,6 +16,7 @@ export default defineConfig({
       background_color: "#C492B1",
       orientation: "portrait-primary",
       lang: "en-US",
+      start_url: "https://live-lyrics-for-spotify.glitch.me/",
       icons: [
         {
           src: 'android-chrome-36x36.png',
