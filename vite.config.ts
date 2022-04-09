@@ -10,7 +10,6 @@ export default defineConfig({
     manifest: {
       name: "Live Lyrics for Spotify",
       short_name: "Live Lyrics",
-      start_url: "/",
       description: "A custom implementation of Live Lyrics for Spotify, inspired by Apple Music.",
       display: "standalone",
       theme_color: "#DB2763",
@@ -53,7 +52,7 @@ export default defineConfig({
           src: 'apple-touch-icon.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable',
+          purpose: 'maskable',
         }
       ]
     }

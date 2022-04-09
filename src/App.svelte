@@ -22,7 +22,7 @@
     authArgs.append("client_id", clientId);
     authArgs.append("response_type", "token");
     authArgs.append("show_dialog", "false");
-    authArgs.append("redirect_uri", "http://localhost:3000/");
+    authArgs.append("redirect_uri", window.location.href);
     authArgs.append("scope", "user-modify-playback-state user-read-playback-state user-library-modify user-read-currently-playing user-library-read");
     const auth_url = "https://accounts.spotify.com/authorize?" + authArgs.toString();
     const parameters = writable(getParameters());
