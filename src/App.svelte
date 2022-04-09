@@ -26,7 +26,6 @@
     // @ts-ignore
     import { registerSW } from "virtual:pwa-register";
 
-    console.log("registerSW", registerSW);
     const updateSW = registerSW({
         onOfflineReady() {
             /*console.log("SW is ready");*/
