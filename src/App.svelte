@@ -1,12 +1,36 @@
+<script lang="ts" context="module">
+    declare module "virtual:pwa-register/svelte" {
+        // @ts-ignore ignore when svelte is not installed
+        import { Writable } from "svelte/store";
+
+        export type RegisterSWOptions = {
+            immediate?: boolean;
+            onNeedRefresh?: () => void;
+            onOfflineReady?: () => void;
+            onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void;
+            onRegisterError?: (error: any) => void;
+        };
+
+        export function useRegisterSW(options?: RegisterSWOptions): {
+            needRefresh: Writable<boolean>;
+            offlineReady: Writable<boolean>;
+            updateServiceWorker: (reloadPage?: boolean) => Promise<void>;
+        };
+    }
+</script>
+
 <script lang="ts">
-    if(window.location.protocol === "http:" && window.location.hostname !== "localhost") {
+    if (window.location.protocol === "http:" && window.location.hostname !== "localhost") {
         window.location.protocol = "https:";
     }
     // @ts-ignore
     import { registerSW } from "virtual:pwa-register";
 
+    console.log("registerSW", registerSW);
     const updateSW = registerSW({
-        onOfflineReady() {},
+        onOfflineReady() {
+            /*console.log("SW is ready");*/
+        },
     });
 
     import logo from "./assets/llfs.svg";
@@ -29,7 +53,6 @@
     setContext("auth_data", parameters);
     let params: AuthParameters | void;
     parameters.subscribe((p) => (params = p));
-    updateSW();
 </script>
 
 {#if params}

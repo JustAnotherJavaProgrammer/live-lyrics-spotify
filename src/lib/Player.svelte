@@ -121,6 +121,7 @@
     .album-art {
         background-color: #db2763;
         max-height: 15vh;
+        min-height: 5em;
         /* aspect-ratio: 1/1; */
         box-shadow: 0.1em 0.1em 0.2em 0 rgba(0, 0, 0, 0.5);
         flex: 0 1 15vh;
@@ -132,13 +133,13 @@
     }
 
     .song-name {
-        font-size: min(7.5vmin, 10em);
+        font-size: max(5vmin, 2em);
         margin: 0 0 0.1em 0;
         overflow: hidden;
     }
 
     .artist-name {
-        font-size: min(2.5vmin, 3.3em);
+        font-size: max(2.5vmin, 1em);
         color: rgba(255, 255, 255, 0.75);
         margin: 0 0 0 0;
         overflow: hidden;
@@ -154,19 +155,21 @@
         border: none;
         outline: none;
         box-shadow: none;
-        height: 5vh;
-        width: 5vh;
-        max-height: 5vh;
-        max-width: 5vh;
+        min-height: max(5vmin, 2em);
+        min-width: max(5vmin, 2em);
+        height: max(5vmin, 2em);
+        width: max(5vmin, 2em);
+        max-height: max(5vmin, 2em);
+        max-width: max(5vmin, 2em);
         cursor: pointer;
     }
 
     .fullscreen-toggle:hover {
-        height: 6vh;
-        width: 6vh;
-        max-height: 6vh;
-        max-width: 6vh;
-        flex-basis: 6vh;
+        height: max(6vmin, 2.2em);
+        width: max(6vmin, 2.2em);
+        max-height: max(6vmin, 2.2em);
+        max-width: max(6vmin, 2.2em);
+        flex-basis: max(6vmin, 2.2em);
         margin-right: 3.5vmin;
     }
 

@@ -7,13 +7,14 @@ export default defineConfig({
   plugins: [svelte(), VitePWA({
     includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
     registerType: 'autoUpdate',
+    strategies: "generateSW",
     manifest: {
       name: "Live Lyrics for Spotify",
       short_name: "Live Lyrics",
       description: "A custom implementation of Live Lyrics for Spotify, inspired by Apple Music.",
       display: "standalone",
       theme_color: "#DB2763",
-      background_color: "#C492B1",
+      background_color: "#DB2763",
       orientation: "portrait-primary",
       lang: "en-US",
       start_url: "https://live-lyrics-for-spotify.glitch.me/",
@@ -54,6 +55,12 @@ export default defineConfig({
           sizes: '512x512',
           type: 'image/png',
           purpose: 'maskable',
+        },
+        {
+          src: 'apple-touch-icon.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any',
         }
       ]
     }
