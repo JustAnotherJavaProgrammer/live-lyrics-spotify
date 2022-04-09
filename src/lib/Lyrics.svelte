@@ -8,6 +8,7 @@
 
     // Scrolling polyfill
     import { elementScrollIntoViewPolyfill } from "seamless-scroll-polyfill";
+    import { isAnyVisible } from "./visibility";
     elementScrollIntoViewPolyfill();
     let interval: number;
 
@@ -38,7 +39,7 @@
 
     let linesList: HTMLElement;
 
-    function updateActive() {
+    async function updateActive() {
         // console.log(Date.now(), "updateActive");
         if (linesList == null) {
             console.warn("linesList == null");
@@ -65,7 +66,12 @@
         const newActive = document.getElementById("line-" + activeIndex);
         if (newActive != null) {
             newActive.classList.add("active");
-            newActive.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (await isAnyVisible([newActive, prevActive])) {
+                console.log("Scroll into view");
+                newActive.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else {
+                console.log("Don't scroll into view (not visible)");
+            }
         }
         scheduleNextUpdate(activeIndex, currentPosition, lyrics);
     }
@@ -96,10 +102,13 @@
     onMount(() => {
         updateActive();
         document.addEventListener("visibilitychange", handleVisibilityChange);
+        document.addEventListener("fullscreenchange", handleVisibilityChange);
     });
     onDestroy(() => {
         console.warn("Lyrics destroyed");
         if (interval != undefined) window.clearTimeout(interval);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        document.removeEventListener("fullscreenchange", handleVisibilityChange);
     });
 
     function skipToLine(
@@ -159,14 +168,15 @@
         text-decoration: none;
         color: #b0db43;
         border: 0.1em solid #b0db43;
-        transition: color 0.1s, border-color 0.1s;
+        transition: color 0.1s, background-color 0.1s;
         cursor: pointer;
     }
 
     a:hover,
     a.line:hover {
-        color: #db2763;
-        border-color: #db2763;
+        background-color: #b0db43;
+        color: black;
+        mix-blend-mode: screen;
     }
 
     .line {
