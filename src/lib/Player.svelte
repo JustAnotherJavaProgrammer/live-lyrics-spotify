@@ -9,6 +9,7 @@
     import closeFullscreenIcon from "../assets/close_fullscreen.svg";
     import { manuallySetProgress, remainingPlaybackTime } from "./playback";
     import Lyrics from "./Lyrics.svelte";
+    import { startWakelock, stopWakelock } from "./wakelock";
     const auth_data = getContext("auth_data") as Writable<AuthParameters>;
     const auth_params = get(auth_data);
     const spotify = new SpotifyWebApi();
@@ -18,9 +19,13 @@
     const pbs = writable(playbackState);
     let interval: number;
 
-    onMount(updatePlaybackState);
+    onMount(() => {
+        startWakelock();
+        updatePlaybackState();
+    });
     onDestroy(() => {
         if (interval != undefined) window.clearInterval(interval);
+        stopWakelock();
     });
 
     // let lastId: string = null;
@@ -62,7 +67,7 @@
 
     let main: HTMLElement;
     function toggleFullscreen() {
-        if(!document.fullscreenElement) {
+        if (!document.fullscreenElement) {
             main?.requestFullscreen();
         } else {
             document?.exitFullscreen();
@@ -78,7 +83,7 @@
                 <h1 class="song-name">{playbackState?.item?.name ?? "No playback"}</h1>
                 <h2 class="artist-name">{playbackState?.item?.artists?.map((a) => a.name).join(" & ") ?? "Live Lyrics for Spotify"}</h2>
             </div>
-            <button on:click={toggleFullscreen} class="fullscreen-toggle" style={`--open:url("${fullscreenIcon}");--close:url("${closeFullscreenIcon}");`}></button>
+            <button on:click={toggleFullscreen} class="fullscreen-toggle" style={`--open:url("${fullscreenIcon}");--close:url("${closeFullscreenIcon}");`} />
         </header>
         <Lyrics {pbs} on:skip={jumpToPosition} />
     </section>
@@ -140,7 +145,7 @@
         padding-left: 0.1em;
     }
 
-    .fullscreen-toggle{
+    .fullscreen-toggle {
         background: var(--open) no-repeat center/contain;
         justify-self: flex-end;
         margin-left: auto;

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="163.49516mm"
+   height="163.49516mm"
+   viewBox="0 0 163.49516 163.49516"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="LLFS.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.0482005"
+     inkscape:cx="237.54998"
+     inkscape:cy="334.38261"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-grids="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1282" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-29.627416,-46.048085)">
+    <circle
+       style="fill:#db2760;fill-opacity:1;stroke:#db2763;stroke-width:4.99999;stroke-opacity:1"
+       id="path846"
+       cx="111.375"
+       cy="127.79567"
+       r="79.247589" />
+    <rect
+       style="fill:#12eaea;fill-opacity:1;stroke:#12eaea;stroke-width:4.00257;stroke-opacity:1"
+       id="rect1112"
+       width="108.8027"
+       height="12.420494"
+       x="56.973648"
+       y="79.46283"
+       rx="3.2649167" />
+    <rect
+       style="fill:#12eaea;fill-opacity:1;stroke:#b0db43;stroke-width:6.657;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round"
+       id="rect1112-7"
+       width="140.05518"
+       height="26.694525"
+       x="41.347408"
+       y="114.4484"
+       rx="4.2027311" />
+    <rect
+       style="fill:#12eaea;fill-opacity:1;stroke:#12eaea;stroke-width:4.00257;stroke-opacity:1"
+       id="rect1112-8"
+       width="108.8027"
+       height="12.420494"
+       x="56.973648"
+       y="164.77773"
+       rx="3.2649167" />
+  </g>
+</svg>

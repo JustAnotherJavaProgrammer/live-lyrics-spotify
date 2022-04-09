@@ -1,4 +1,14 @@
 <script lang="ts">
+    if(window.location.protocol === "http:" && window.location.hostname !== "localhost") {
+        window.location.protocol = "https:";
+    }
+    // @ts-ignore
+    import { registerSW } from "virtual:pwa-register";
+
+    const updateSW = registerSW({
+        onOfflineReady() {},
+    });
+
     import logo from "./assets/llfs.svg";
     import getParameters, { AuthParameters } from "./lib/parameters";
     import { clientId } from "../config.json";
@@ -19,6 +29,7 @@
     setContext("auth_data", parameters);
     let params: AuthParameters | void;
     parameters.subscribe((p) => (params = p));
+    updateSW();
 </script>
 
 {#if params}

@@ -1,7 +1,7 @@
 export async function isVisible(element: Element): Promise<boolean> {
     return new Promise((res) => {
         const observer = new IntersectionObserver((entries) => {
-            console.log("entries", entries);
+            // console.log("entries", entries);
             for (const entry of entries) {
                 observer.unobserve(element);
                 if (entry.target == element) {
@@ -18,7 +18,7 @@ export function isAnyVisible(elements: Element[]): Promise<boolean> {
     elements = elements.filter(e => e != null);
     return new Promise((res) => {
         const observer = new IntersectionObserver((entries) => {
-            console.log("entries", entries);
+            // console.log("entries", entries);
             for (const entry of entries) {
                 observer.unobserve(entry.target);
                 elements.splice(elements.indexOf(entry.target), 1);

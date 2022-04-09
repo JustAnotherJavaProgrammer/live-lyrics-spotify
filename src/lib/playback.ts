@@ -4,7 +4,7 @@ export function currentPlaybackPosition(playbackState: SpotifyApi.CurrentPlaybac
     const corrFactor = Date.now() - (playbackState?.timestamp ?? Date.now());
     // console.log("corrFactor", corrFactor);
     // console.log("playbackState_timestamp", playbackState?.timestamp);
-    return (playbackState?.progress_ms ?? 0) + corrFactor;
+    return (playbackState?.progress_ms ?? 0) + (playbackState?.is_playing ? corrFactor : 0);
 }
 
 export function remainingPlaybackTime(playbackState: SpotifyApi.CurrentPlaybackResponse) {

@@ -17,11 +17,11 @@
     export let pbs: Writable<SpotifyApi.CurrentPlaybackResponse>;
     let playbackState: SpotifyApi.CurrentPlaybackResponse;
     let lastId: string = null;
-    let lyrics: LyricLine[] | null | "";
+    let lyrics: LyricLine[] | null | "" | 403;
     async function updateLyrics(p: SpotifyApi.CurrentPlaybackResponse) {
         if (p === undefined) return;
         playbackState = p;
-        if (playbackState?.item?.id !== lastId) {
+        if (playbackState?.item?.id !== lastId || lyrics === 403) {
             lyrics = "";
             lastId = playbackState?.item?.id;
             lyrics = await getLyrics(playbackState?.item?.name + " " + playbackState?.item?.artists?.map((a) => a.name).join(", "));
@@ -49,12 +49,12 @@
                 return;
             }
         }
-        if (lyrics == null || lyrics == "") return;
+        if (lyrics == null || lyrics == "" || lyrics === 403) return;
         const currentPosition = currentPlaybackPosition(playbackState);
         // console.log("currentPosition", currentPosition);
         const sec = Math.floor(currentPosition / 1000);
         // console.log("sec%60", sec % 60);
-        const activeIndex = lyrics.findIndex((l, i) => l.seconds <= sec && (i + 1 >= lyrics.length || (lyrics[i + 1] as LyricLine).seconds > sec));
+        const activeIndex = lyrics.findIndex((l, i) => l.seconds <= sec && (i + 1 >= (lyrics as LyricLine[]).length || (lyrics[i + 1] as LyricLine).seconds > sec));
         // console.log(sec, activeIndex);
         const prevActive = linesList.getElementsByClassName("active")[0];
         if (prevActive != null) {
@@ -67,11 +67,12 @@
         if (newActive != null) {
             newActive.classList.add("active");
             if (await isAnyVisible([newActive, prevActive])) {
-                console.log("Scroll into view");
+                // console.log("Scroll into view");
                 newActive.scrollIntoView({ behavior: "smooth", block: "center" });
-            } else {
-                console.log("Don't scroll into view (not visible)");
             }
+            //  else {
+            //     console.log("Don't scroll into view (not visible)");
+            // }
         }
         scheduleNextUpdate(activeIndex, currentPosition, lyrics);
     }
@@ -119,7 +120,7 @@
         const line = event.currentTarget;
         if (!line.id.startsWith("line-")) return;
         const index = parseInt(line.id.substring(5));
-        if (index < 0 || index >= lyrics.length) return;
+        if (!Array.isArray(lyrics) || index < 0 || index >= lyrics.length) return;
         const newProgress = (lyrics[index] as unknown as LyricLine)?.seconds * 1000;
         dispatch("skip", newProgress);
     }
@@ -130,7 +131,6 @@
         <span class="line">Start playing something on Spotify to see the lyrics</span>
     {:else if lyrics == null}
         <span class="line">No live lyrics available</span>
-        <br />
         <a
             class="line"
             href={"https://genius.com/" + (playbackState?.item?.artists?.map((a) => a.name).join(" ") + " " + playbackState?.item?.name).replaceAll(/\s/gm, "-") + "-lyrics"}
@@ -139,6 +139,15 @@
         >
     {:else if lyrics == ""}
         <span class="line active">Loading...</span>
+    {:else if lyrics == 403}
+        <span class="line">Can't access lyrics database</span>
+        <a class="line" href="http://cors-anywhere.herokuapp.com/" rel="noreferrer noopener" target="_blank">Enable access</a>
+        <button
+            class="line"
+            on:click={() => {
+                updateLyrics(playbackState);
+            }}>Try again</button
+        >
     {:else}
         {#each lyrics as line, index}
             <span class="line" id="line-{index.toString()}" on:click={skipToLine}>{line.lyrics}</span>
@@ -164,7 +173,11 @@
     }
 
     a,
-    a.line {
+    a.line,
+    button.line {
+        font-size: inherit;
+        font: inherit;
+        background: none;
         text-decoration: none;
         color: #b0db43;
         border: 0.1em solid #b0db43;
@@ -173,7 +186,8 @@
     }
 
     a:hover,
-    a.line:hover {
+    a.line:hover,
+    button.line:hover {
         background-color: #b0db43;
         color: black;
         mix-blend-mode: screen;
