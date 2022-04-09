@@ -1,6 +1,13 @@
+let runningRequest = undefined;
+
 export default async function getLyrics(song: string): Promise<LyricLine[] | null> {
     try {
-        const response = await fetch("https://api.textyl.co/api/lyrics?" + new URLSearchParams({ q: song }).toString(), { mode: "cors", headers: [["Origin", "https://api.textyl.co"]] });
+        if (runningRequest) {
+            await runningRequest;
+        }
+        runningRequest = fetch("https://cors-anywhere.herokuapp.com/https://api.textyl.co/api/lyrics?" + new URLSearchParams({ q: song }).toString(), { mode: "cors", headers: [["Origin", "https://api.textyl.co"]] });
+        const response = await runningRequest;
+        runningRequest = undefined;
         if (!response.ok) {
             console.error(response);
             return null;

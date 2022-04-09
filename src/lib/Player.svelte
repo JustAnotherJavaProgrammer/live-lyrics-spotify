@@ -5,8 +5,10 @@
     import type { AuthParameters } from "./parameters";
     import SpotifyWebApi from "spotify-web-api-js";
     import logo from "../assets/llfs.svg";
-    import { remainingPlaybackTime } from "./playback";
-import Lyrics from "./Lyrics.svelte";
+    import fullscreenIcon from "../assets/fullscreen.svg";
+    import closeFullscreenIcon from "../assets/close_fullscreen.svg";
+    import { manuallySetProgress, remainingPlaybackTime } from "./playback";
+    import Lyrics from "./Lyrics.svelte";
     const auth_data = getContext("auth_data") as Writable<AuthParameters>;
     const auth_params = get(auth_data);
     const spotify = new SpotifyWebApi();
@@ -21,21 +23,54 @@ import Lyrics from "./Lyrics.svelte";
         if (interval != undefined) window.clearInterval(interval);
     });
 
-    async function updatePlaybackState() {
-        try {
-            playbackState = await spotify.getMyCurrentPlaybackState();
-            coverImg = playbackState?.item?.album?.images[0]?.url;
-            pbs.set(playbackState);
-        } catch (err) {
-            console.error(err);
-            auth_data.set(undefined);
+    // let lastId: string = null;
+    // let corrTime: number = 0;
+    let operationUnderway = false;
+    async function updatePlaybackState(resetOp = false) {
+        if (!operationUnderway || resetOp) {
+            try {
+                const before = Date.now();
+                playbackState = await spotify.getMyCurrentPlaybackState();
+                if (resetOp) operationUnderway = false;
+                if (operationUnderway) return;
+                if (playbackState != undefined && (playbackState as unknown as string) != "") {
+                    // if(playbackState.item.id != lastId) {
+                    //     corrTime=0;
+                    // }
+                    // playbackState.timestamp += playbackState.progress_ms + Math.floor((Date.now() - before) / 2);
+                    playbackState.timestamp = Date.now() - Math.floor((Date.now() - before) / 2);
+                }
+                coverImg = playbackState?.item?.album?.images[0]?.url;
+                // console.log("fetchedPlaybackState.timestamp", playbackState.progress_ms);
+                if (!operationUnderway) pbs.set(playbackState);
+            } catch (err) {
+                console.error(err);
+                auth_data.set(undefined);
+            }
+            const remainingTime = remainingPlaybackTime(playbackState);
+            interval = window.setTimeout(updatePlaybackState, Math.min(remainingTime > 0 && playbackState?.is_playing ? remainingTime : 5000, 5000));
         }
-        const remainingTime = remainingPlaybackTime(playbackState);
-        interval = window.setTimeout(updatePlaybackState, Math.min(remainingTime > 0 ? remainingTime : 5000, 5000));
+    }
+
+    function jumpToPosition(event: CustomEvent<number>) {
+        manuallySetProgress(playbackState, pbs, event.detail);
+        operationUnderway = true;
+        spotify.seek(event.detail).then(() => {
+            updatePlaybackState(true);
+        });
+    }
+
+    let main: HTMLElement;
+    function toggleFullscreen() {
+        if(!document.fullscreenElement) {
+            main?.requestFullscreen();
+        } else {
+            document?.exitFullscreen();
+        }
     }
 </script>
 
-<main in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250, delay: 0 }}>
+<main bind:this={main} in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250, delay: 0 }}>
     <section class="main-section">
         <header>
             <img class="album-art" alt="Album art" src={coverImg ?? logo} />
@@ -43,8 +78,9 @@ import Lyrics from "./Lyrics.svelte";
                 <h1 class="song-name">{playbackState?.item?.name ?? "No playback"}</h1>
                 <h2 class="artist-name">{playbackState?.item?.artists?.map((a) => a.name).join(" & ") ?? "Live Lyrics for Spotify"}</h2>
             </div>
+            <button on:click={toggleFullscreen} class="fullscreen-toggle" style={`--open:url("${fullscreenIcon}");--close:url("${closeFullscreenIcon}");`}></button>
         </header>
-        <Lyrics pbs={pbs}/>
+        <Lyrics {pbs} on:skip={jumpToPosition} />
     </section>
     {#if coverImg}
         <div class="background-cover">
@@ -73,7 +109,7 @@ import Lyrics from "./Lyrics.svelte";
         flex-direction: row;
         justify-content: start;
         align-items: center;
-        box-shadow: 0.2em 0 0.2em 0 rgba(0, 0, 0, 1);
+        box-shadow: 0 0 0.2em 0 rgba(0, 0, 0, 1);
         box-sizing: border-box;
     }
 
@@ -104,6 +140,35 @@ import Lyrics from "./Lyrics.svelte";
         padding-left: 0.1em;
     }
 
+    .fullscreen-toggle{
+        background: var(--open) no-repeat center/contain;
+        justify-self: flex-end;
+        margin-left: auto;
+        margin-right: 4vmin;
+        flex: 0 1 5vh;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        height: 5vh;
+        width: 5vh;
+        max-height: 5vh;
+        max-width: 5vh;
+        cursor: pointer;
+    }
+
+    .fullscreen-toggle:hover {
+        height: 6vh;
+        width: 6vh;
+        max-height: 6vh;
+        max-width: 6vh;
+        flex-basis: 6vh;
+        margin-right: 3.5vmin;
+    }
+
+    *:fullscreen .fullscreen-toggle {
+        background-image: var(--close);
+    }
+
     div.background-cover {
         z-index: -1;
         position: absolute;
@@ -130,6 +195,6 @@ import Lyrics from "./Lyrics.svelte";
         margin: 0;
         padding: 0;
         background: var(--img) #c492b1 no-repeat center/cover;
-        filter: blur(10vmax);
+        filter: brightness(0.8) blur(10vmax);
     }
 </style>

@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 export default function getParameters(): AuthParameters | void {
     {
         const params = new URLSearchParams(window.location.hash.substring(1));
-        console.log(params);
+        // console.log(params);
         if (params.has("access_token") && params.has("expires_in")) {
             Cookies.set("token", params.get("access_token"), { sameSite: "Strict" });
             Cookies.set("expires_at", (Date.now() + parseInt(params.get("expires_in")) * 1000).toString(), { sameSite: "Strict" });

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "js-cookie": "^3.0.1",
+    "seamless-scroll-polyfill": "^2.1.8",
     "spotify-web-api-js": "^1.5.2"
   }
 }
