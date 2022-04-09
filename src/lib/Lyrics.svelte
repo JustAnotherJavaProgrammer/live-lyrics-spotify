@@ -20,8 +20,9 @@
     let lyrics: LyricLine[] | null | "" | 403;
     async function updateLyrics(p: SpotifyApi.CurrentPlaybackResponse) {
         if (p === undefined) return;
+        const lyricsChanged = p?.item?.id !== lastId || (p?.is_playing && !playbackState?.is_playing) || lyrics === 403;
         playbackState = p;
-        if (playbackState?.item?.id !== lastId || lyrics === 403) {
+        if (lyricsChanged) {
             lyrics = "";
             lastId = playbackState?.item?.id;
             lyrics = await getLyrics(playbackState?.item?.name + " " + playbackState?.item?.artists?.map((a) => a.name).join(", "));
@@ -32,14 +33,14 @@
             //     }
             // }
         }
-        tick().then(updateActive);
+        tick().then(() => updateActive(lyricsChanged));
     }
     updateLyrics(get(pbs));
     pbs.subscribe(updateLyrics);
 
     let linesList: HTMLElement;
 
-    async function updateActive() {
+    async function updateActive(ignoreVisibility = false) {
         // console.log(Date.now(), "updateActive");
         if (linesList == null) {
             console.warn("linesList == null");
@@ -66,7 +67,7 @@
         const newActive = document.getElementById("line-" + activeIndex);
         if (newActive != null) {
             newActive.classList.add("active");
-            if (await isAnyVisible([newActive, prevActive])) {
+            if (ignoreVisibility || await isAnyVisible([newActive, prevActive])) {
                 // console.log("Scroll into view");
                 newActive.scrollIntoView({ behavior: "smooth", block: "center" });
             }
@@ -104,12 +105,14 @@
         updateActive();
         document.addEventListener("visibilitychange", handleVisibilityChange);
         document.addEventListener("fullscreenchange", handleVisibilityChange);
+        window.addEventListener("resize", handleVisibilityChange);
     });
     onDestroy(() => {
         console.warn("Lyrics destroyed");
         if (interval != undefined) window.clearTimeout(interval);
         document.removeEventListener("visibilitychange", handleVisibilityChange);
         document.removeEventListener("fullscreenchange", handleVisibilityChange);
+        window.removeEventListener("resize", handleVisibilityChange);
     });
 
     function skipToLine(

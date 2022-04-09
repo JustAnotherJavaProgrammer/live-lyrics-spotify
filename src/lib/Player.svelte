@@ -58,9 +58,16 @@
     }
 
     function jumpToPosition(event: CustomEvent<number>) {
-        manuallySetProgress(playbackState, pbs, event.detail);
+        seek(event.detail, true);
+    }
+
+    function seek(position_ms: number, restartIfStopped = false) {
+        manuallySetProgress(playbackState, pbs, position_ms);
         operationUnderway = true;
-        spotify.seek(event.detail).then(() => {
+        spotify.seek(position_ms).then(async () => {
+            if (restartIfStopped && !playbackState.is_playing) {
+                await spotify.play();
+            }
             updatePlaybackState(true);
         });
     }
@@ -116,6 +123,7 @@
         align-items: center;
         box-shadow: 0 0 0.2em 0 rgba(0, 0, 0, 1);
         box-sizing: border-box;
+        z-index: 10;
     }
 
     .album-art {
