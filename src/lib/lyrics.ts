@@ -1,6 +1,15 @@
 let runningRequest: Promise<Response> = undefined;
 
 export default async function getLyrics(song: string): Promise<LyricLine[] | null | 403> {
+    if (localStorage) {
+        const cachedLyrics = JSON.parse(localStorage.getItem(song)) as LyricLine[];
+        if (cacheLyrics != null)
+            return cachedLyrics;
+    }
+    return fetchLyrics(song);
+}
+
+async function fetchLyrics(song: string): Promise<LyricLine[] | null | 403> {
     try {
         if (runningRequest) {
             await runningRequest;
@@ -10,15 +19,28 @@ export default async function getLyrics(song: string): Promise<LyricLine[] | nul
         runningRequest = undefined;
         if (!response.ok) {
             console.error(response);
-            if(response.status === 403) {
+            if (response.status === 403) {
                 return 403;
             }
             return null;
         }
-        return await response.json() as LyricLine[];
+        const lyrics = await response.json() as LyricLine[];
+        if (localStorage)
+            localStorage.setItem(song, JSON.stringify(lyrics));
+        return lyrics;
     } catch (err) {
         console.log(err);
         return null;
+    }
+}
+
+export async function cacheLyrics(song: string) {
+    if (!localStorage) return;
+    if (localStorage.getItem(song) === null) {
+        const lyrics = await fetchLyrics(song);
+        if (Array.isArray(lyrics)) {
+            localStorage.setItem(song, JSON.stringify(lyrics));
+        }
     }
 }
 

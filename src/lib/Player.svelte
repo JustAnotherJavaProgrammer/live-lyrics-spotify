@@ -63,6 +63,7 @@
 
     function seek(position_ms: number, restartIfStopped = false) {
         manuallySetProgress(playbackState, pbs, position_ms);
+        playbackState.is_playing=false;
         operationUnderway = true;
         spotify.seek(position_ms).then(async () => {
             if (restartIfStopped && !playbackState.is_playing) {
@@ -73,12 +74,14 @@
     }
 
     let main: HTMLElement;
-    function toggleFullscreen() {
+    let isFullscreen = document.fullscreenElement != null;
+    async function toggleFullscreen() {
         if (!document.fullscreenElement) {
-            main?.requestFullscreen();
+            await main?.requestFullscreen();
         } else {
-            document?.exitFullscreen();
+            await document?.exitFullscreen();
         }
+        isFullscreen = document.fullscreenElement != null;
     }
 </script>
 
@@ -94,9 +97,9 @@
         </header>
         <Lyrics {pbs} on:skip={jumpToPosition} />
     </section>
-    {#if coverImg}
+    {#if coverImg || isFullscreen}
         <div class="background-cover">
-            <aside class="background-cover" style={`--img:url("${coverImg}");`} />
+            <aside class="background-cover" style={`--img:url("${coverImg ?? logo}");`} />
         </div>
     {/if}
 </main>
@@ -156,6 +159,7 @@
 
     .fullscreen-toggle {
         background: var(--open) no-repeat center/contain;
+        -webkit-tap-highlight-color: transparent;
         justify-self: flex-end;
         margin-left: auto;
         margin-right: 4vmin;

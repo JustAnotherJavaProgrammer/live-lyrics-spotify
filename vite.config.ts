@@ -5,7 +5,7 @@ import {VitePWA} from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [svelte(), VitePWA({
-    includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+    includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png', "fonts/**/*.*"],
     registerType: 'autoUpdate',
     strategies: "generateSW",
     manifest: {

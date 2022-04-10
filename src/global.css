@@ -1,0 +1,15 @@
+:root {
+    font-family: Inter, Helvetica, Arial, Roboto, sans-serif;
+    background: url("/llfs_blurry.svg") #db2763 no-repeat center/cover;
+    color: #ffffff;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+}
+
+.info, h1, h2, h3, h4, h5, h6 {
+    font-family: Inter, Helvetica, Arial, Roboto, sans-serif;
+    font-weight: 600;
+}
