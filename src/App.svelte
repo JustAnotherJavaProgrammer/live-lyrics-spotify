@@ -53,6 +53,7 @@
     setContext("auth_data", parameters);
     let params: AuthParameters | void;
     parameters.subscribe((p) => (params = p));
+
 </script>
 
 {#if params}
