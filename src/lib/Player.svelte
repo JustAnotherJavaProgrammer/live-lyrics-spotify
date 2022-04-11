@@ -104,7 +104,7 @@
         }
         const nextUpdate = 1000 - (progress_time % 1000);
         if (interval_progress != undefined) window.clearInterval(interval_progress);
-        interval_progress = window.setTimeout(updateProgress, nextUpdate);
+        if (playbackState?.is_playing) interval_progress = window.setTimeout(updateProgress, nextUpdate);
     }
     function startSeeking(event: CustomEvent<number>) {
         isSeeking = true;
