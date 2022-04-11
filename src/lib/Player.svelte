@@ -7,9 +7,11 @@
     import logo from "../assets/llfs.svg";
     import fullscreenIcon from "../assets/fullscreen.svg";
     import closeFullscreenIcon from "../assets/close_fullscreen.svg";
-    import { manuallySetProgress, remainingPlaybackTime } from "./playback";
+    import { currentPlaybackPosition, manuallySetProgress, remainingPlaybackTime } from "./playback";
     import Lyrics from "./Lyrics.svelte";
     import { startWakelock, stopWakelock } from "./wakelock";
+    import SeekBar from "./SeekBar.svelte";
+    import { clamp } from "./util";
     const auth_data = getContext("auth_data") as Writable<AuthParameters>;
     const auth_params = get(auth_data);
     const spotify = new SpotifyWebApi();
@@ -18,6 +20,7 @@
     let playbackState: SpotifyApi.CurrentPlaybackResponse;
     const pbs = writable(playbackState);
     let interval: number;
+    let interval_progress: number;
 
     onMount(() => {
         startWakelock();
@@ -25,6 +28,7 @@
     });
     onDestroy(() => {
         if (interval != undefined) window.clearInterval(interval);
+        if (interval_progress != undefined) window.clearInterval(interval_progress);
         stopWakelock();
     });
 
@@ -52,27 +56,31 @@
                 console.error(err);
                 auth_data.set(undefined);
             }
+            updateProgress();
             const remainingTime = remainingPlaybackTime(playbackState);
             interval = window.setTimeout(updatePlaybackState, Math.min(remainingTime > 0 && playbackState?.is_playing ? remainingTime : 5000, 5000));
         }
     }
 
+    // Seeking from lyrics
     function jumpToPosition(event: CustomEvent<number>) {
         seek(event.detail, true);
     }
 
     function seek(position_ms: number, restartIfStopped = false) {
         manuallySetProgress(playbackState, pbs, position_ms);
-        playbackState.is_playing=false;
+        playbackState.is_playing = false;
         operationUnderway = true;
+        // const id = playbackState.item.id;
         spotify.seek(position_ms).then(async () => {
             if (restartIfStopped && !playbackState.is_playing) {
-                await spotify.play();
+                await spotify.play({ position_ms });
             }
             updatePlaybackState(true);
         });
     }
 
+    // Fullscreen
     let main: HTMLElement;
     let isFullscreen = document.fullscreenElement != null;
     async function toggleFullscreen() {
@@ -82,6 +90,47 @@
             await document?.exitFullscreen();
         }
         isFullscreen = document.fullscreenElement != null;
+    }
+
+    // Seek bar
+    let progress = 0;
+    let progress_time = 0;
+    let isSeeking = false;
+    function updateProgress() {
+        if (!isSeeking) {
+            progress_time = clamp(0, currentPlaybackPosition(playbackState), playbackState?.item?.duration_ms ?? 0);
+            if (playbackState?.item?.duration_ms == undefined) progress = 0;
+            else progress = progress_time / playbackState?.item?.duration_ms;
+        }
+        const nextUpdate = 1000 - (progress_time % 1000);
+        if (interval_progress != undefined) window.clearInterval(interval_progress);
+        interval_progress = window.setTimeout(updateProgress, nextUpdate);
+    }
+    function startSeeking(event: CustomEvent<number>) {
+        isSeeking = true;
+        changeSeekPos(event);
+    }
+    function changeSeekPos(event: CustomEvent<number>) {
+        progress = event.detail;
+        progress_time = progress * playbackState?.item?.duration_ms ?? 0;
+    }
+    function endSeeking(event: CustomEvent<number>) {
+        isSeeking = false;
+        changeSeekPos(event);
+        seek(Math.floor(progress_time));
+    }
+    function formatMillis(millis: number) {
+        let num = Math.floor(millis / 1000);
+        let result = (num % 60).toString().padStart(2, "0"); // seconds
+        num = Math.floor(num / 60);
+        // if (num > 0) {
+        result = (num % 60).toString().padStart(2, "0") + ":" + result; // minutes:seconds
+        num = Math.floor(num / 60);
+        if (num > 0) {
+            result = num + ":" + result; // hours:minutes:seconds
+        }
+        // }
+        return result;
     }
 </script>
 
@@ -96,6 +145,13 @@
             <button on:click={toggleFullscreen} class="fullscreen-toggle" style={`--open:url("${fullscreenIcon}");--close:url("${closeFullscreenIcon}");`} />
         </header>
         <Lyrics {pbs} on:skip={jumpToPosition} />
+        <footer>
+            <div class="seek">
+                <span id="progress_time">{formatMillis(progress_time ?? 0)}</span>
+                <SeekBar width="max(50vmax, 80vmin)" height="max(1vh, 5px)" {progress} on:dragStart={startSeeking} on:dragChange={changeSeekPos} on:dragEnd={endSeeking} />
+                <span id="song_length">{formatMillis(playbackState?.item?.duration_ms ?? 0)}</span>
+            </div>
+        </footer>
     </section>
     {#if coverImg || isFullscreen}
         <div class="background-cover">
@@ -216,5 +272,24 @@
         padding: 0;
         background: var(--img) #c492b1 no-repeat center/cover;
         filter: brightness(0.8) blur(10vmax);
+    }
+
+    footer {
+        flex: 0 0 fit-content;
+        padding: 0.5em;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        box-shadow: 0 0 0.2em 0 rgba(0, 0, 0, 1);
+        box-sizing: border-box;
+        z-index: 10;
+    }
+
+    .seek {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
 </style>

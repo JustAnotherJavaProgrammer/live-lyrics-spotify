@@ -3,7 +3,7 @@ let runningRequest: Promise<Response> = undefined;
 export default async function getLyrics(song: string): Promise<LyricLine[] | null | 403> {
     if (localStorage) {
         const cachedLyrics = JSON.parse(localStorage.getItem(song)) as LyricLine[];
-        if (cacheLyrics != null)
+        if (cachedLyrics != null)
             return cachedLyrics;
     }
     return fetchLyrics(song);

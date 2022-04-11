@@ -26,6 +26,7 @@
             lyrics = "";
             lastId = playbackState?.item?.id;
             lyrics = await getLyrics(playbackState?.item?.name + " " + playbackState?.item?.artists?.map((a) => a.name).join(", "));
+            if (lyrics === null) lyrics = await getLyrics(playbackState?.item?.name);
             console.log(lyrics);
             // if (lyrics != null) {
             //     for (const line of lyrics) {
@@ -67,7 +68,7 @@
         const newActive = document.getElementById("line-" + activeIndex);
         if (newActive != null) {
             newActive.classList.add("active");
-            if (ignoreVisibility || await isAnyVisible([newActive, prevActive])) {
+            if (ignoreVisibility || (await isAnyVisible([newActive, prevActive]))) {
                 // console.log("Scroll into view");
                 newActive.scrollIntoView({ behavior: "smooth", block: "center" });
             }
