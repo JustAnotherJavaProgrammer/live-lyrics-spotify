@@ -148,7 +148,7 @@
         <footer>
             <div class="seek">
                 <span id="progress_time">{formatMillis(progress_time ?? 0)}</span>
-                <SeekBar width="min(50vmax, 70vw, 80vmin)" height="max(1vh, 5px)" {progress} on:dragStart={startSeeking} on:dragChange={changeSeekPos} on:dragEnd={endSeeking} />
+                <SeekBar width="min(50vmax, 65vw, 80vmin)" height="max(1vh, 5px)" {progress} on:dragStart={startSeeking} on:dragChange={changeSeekPos} on:dragEnd={endSeeking} />
                 <span id="song_length">{formatMillis(playbackState?.item?.duration_ms ?? 0)}</span>
             </div>
         </footer>
