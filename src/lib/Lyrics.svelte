@@ -34,7 +34,10 @@
             //     }
             // }
         }
-        tick().then(() => updateActive(lyricsChanged));
+        tick().then(async () => {
+            await updateActive(lyricsChanged);
+            if (lyricsChanged) scrollToActive(true);
+        });
     }
     updateLyrics(get(pbs));
     pbs.subscribe(updateLyrics);
@@ -54,7 +57,12 @@
         if (lyrics == null || lyrics == "" || lyrics === 403) return;
         const currentPosition = currentPlaybackPosition(playbackState);
         // console.log("currentPosition", currentPosition);
-        const activeIndex = lyrics.findIndex((l, i) => l.startTimeMs <= currentPosition && (l.endTimeMs < l.startTimeMs || currentPosition < l.endTimeMs) && (i + 1 >= (lyrics as LyricLine[]).length || (lyrics[i + 1] as LyricLine).startTimeMs > currentPosition));
+        const activeIndex = lyrics.findIndex(
+            (l, i) =>
+                l.startTimeMs <= currentPosition &&
+                (l.endTimeMs < l.startTimeMs || currentPosition < l.endTimeMs) &&
+                (i + 1 >= (lyrics as LyricLine[]).length || (lyrics[i + 1] as LyricLine).startTimeMs > currentPosition)
+        );
         // console.log(sec, activeIndex);
         const prevActive = linesList.getElementsByClassName("active")[0];
         if (prevActive != null) {
@@ -62,7 +70,7 @@
             if (prevIndex == activeIndex) return scheduleNextUpdate(activeIndex, currentPosition, lyrics);
             prevActive.classList.remove("active");
         }
-        if (activeIndex == -1) return scheduleNextUpdate(activeIndex, currentPosition, lyrics);
+        if (activeIndex == -1) return scheduleNextUpdate(activeIndex, currentPosition, lyrics); // Alternative place for scrolling to the top when lyrics changed, baded on ignoreVisibility
         const newActive = document.getElementById("line-" + activeIndex);
         if (newActive != null) {
             newActive.classList.add("active");
@@ -85,13 +93,14 @@
         }
     }
 
-    function scrollToActive() {
+    function scrollToActive(alternativelyTop = false) {
         if (linesList == null) {
             linesList = document.getElementById("lines-list");
             if (linesList == null) return;
         }
-        const active = linesList.getElementsByClassName("active")[0];
-        if (active == null) return;
+        let active = linesList.getElementsByClassName("active")[0];
+        if (active == null && !alternativelyTop) return;
+        active = active ?? linesList.firstElementChild;
         active.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     function handleVisibilityChange() {
