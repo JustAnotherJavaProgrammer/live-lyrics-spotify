@@ -39,14 +39,10 @@
         },
     });
 
-    import logo from "./assets/llfs.svg";
     import getParameters, { AuthParameters } from "./lib/parameters";
-    import { clientId } from "../config.json";
-    import { fade } from "svelte/transition";
-    import { getContext, hasContext, setContext } from "svelte";
+    import { setContext } from "svelte";
     import { writable } from "svelte/store";
     import Player from "./lib/Player.svelte";
-    import SeekBar from "./lib/SeekBar.svelte";
     import AuthScreen from "./lib/AuthScreen.svelte";
 
     const parameters = writable(getParameters());
