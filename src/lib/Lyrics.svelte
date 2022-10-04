@@ -25,8 +25,8 @@
         if (lyricsChanged) {
             lyrics = "";
             lastId = playbackState?.item?.id;
-            lyrics = await getLyrics(playbackState?.item?.name + " " + playbackState?.item?.artists?.map((a) => a.name).join(", "));
-            if (lyrics === null) lyrics = await getLyrics(playbackState?.item?.name);
+            lyrics = await getLyrics(playbackState?.item?.id);
+            // if (lyrics === null) lyrics = await getLyrics(playbackState?.item?.id);
             console.log(lyrics);
             // if (lyrics != null) {
             //     for (const line of lyrics) {
@@ -54,9 +54,7 @@
         if (lyrics == null || lyrics == "" || lyrics === 403) return;
         const currentPosition = currentPlaybackPosition(playbackState);
         // console.log("currentPosition", currentPosition);
-        const sec = Math.floor(currentPosition / 1000);
-        // console.log("sec%60", sec % 60);
-        const activeIndex = lyrics.findIndex((l, i) => l.seconds <= sec && (i + 1 >= (lyrics as LyricLine[]).length || (lyrics[i + 1] as LyricLine).seconds > sec));
+        const activeIndex = lyrics.findIndex((l, i) => l.startTimeMs <= currentPosition && (l.endTimeMs < l.startTimeMs || currentPosition < l.endTimeMs) && (i + 1 >= (lyrics as LyricLine[]).length || (lyrics[i + 1] as LyricLine).startTimeMs > currentPosition));
         // console.log(sec, activeIndex);
         const prevActive = linesList.getElementsByClassName("active")[0];
         if (prevActive != null) {
@@ -81,7 +79,7 @@
     function scheduleNextUpdate(activeIndex: number, currentPosition: number, lyrics: LyricLine[]) {
         if (activeIndex < lyrics.length - 1) {
             if (interval != undefined) window.clearTimeout(interval);
-            const nextUpdate = Math.max(lyrics[activeIndex + 1].seconds * 1000 - currentPosition, 1);
+            const nextUpdate = Math.max(lyrics[activeIndex + 1]?.startTimeMs - currentPosition, lyrics[activeIndex]?.endTimeMs - currentPosition, 1);
             // console.info("nextUpdate", nextUpdate);
             interval = window.setTimeout(updateActive, nextUpdate);
         }
@@ -125,7 +123,7 @@
         if (!line.id.startsWith("line-")) return;
         const index = parseInt(line.id.substring(5));
         if (!Array.isArray(lyrics) || index < 0 || index >= lyrics.length) return;
-        const newProgress = (lyrics[index] as unknown as LyricLine)?.seconds * 1000;
+        const newProgress = (lyrics[index] as unknown as LyricLine)?.startTimeMs;
         dispatch("skip", newProgress);
     }
 </script>
@@ -154,7 +152,7 @@
         >
     {:else}
         {#each lyrics as line, index}
-            <span class="line" id="line-{index.toString()}" on:click={skipToLine}>{line.lyrics}</span>
+            <span class="line" id="line-{index.toString()}" on:click={skipToLine}>{line.words}</span>
         {/each}
     {/if}
 </article>

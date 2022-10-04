@@ -18,3 +18,7 @@ To use Live Lyrics for Spotify, you can either
 2. Or you send me a message, kindly asking me to add your Spotify account to the whitelist. In that case, you **might** also get access the app.
 
 3. By now, Spotify has launched its own version of Live Lyrics. If you don't care about the design, I would recommend using their version, because it's easier to set up (basically working out-of-the-box) and the quality of their lyrics data is much better (I didn't want to pay for the data and implemented a hacky workaround).
+
+## Acknowledgements
+
+Thank you to [Akash R Chandran](https://github.com/akashrchandran) for creating [this project](https://github.com/akashrchandran/spotify-lyrics-api), which allows indirect access to the lyrics data used by Spotify itself!

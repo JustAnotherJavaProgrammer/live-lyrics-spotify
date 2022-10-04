@@ -76,6 +76,8 @@
             if (restartIfStopped && !playbackState.is_playing) {
                 await spotify.play({ position_ms });
             }
+            /* updatePlaybackState(true); */
+        }).finally(() => {
             updatePlaybackState(true);
         });
     }
