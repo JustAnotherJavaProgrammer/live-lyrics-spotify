@@ -15,6 +15,6 @@ To use Live Lyrics for Spotify, you can either
 1. Host it yourself and create your own [application for the Spotify API](https://developer.spotify.com/dashboard/applications)
 
 > The application ID can be changed in `config.js`
-2. Or you send me a message, kindy asking me to add your Spotify account to the whitelist. In that case, you **might** also get access the app.
+2. Or you send me a message, kindly asking me to add your Spotify account to the whitelist. In that case, you **might** also get access the app.
 
-3. By now, Spotify has launched its own version of Live Lyrics. If you don't care about the design, I would recommend using their version, because it's easier to set up (basically none) and the quality of their lyrics data is much better (I didn't want to pay for the data and implemented a hacky workaround).
+3. By now, Spotify has launched its own version of Live Lyrics. If you don't care about the design, I would recommend using their version, because it's easier to set up (basically working out-of-the-box) and the quality of their lyrics data is much better (I didn't want to pay for the data and implemented a hacky workaround).
