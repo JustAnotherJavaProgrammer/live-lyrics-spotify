@@ -2,7 +2,7 @@
     import { createEventDispatcher, onDestroy, onMount, tick } from "svelte";
 
     import { get, Writable } from "svelte/store";
-    import type { LyricLine } from "./lyrics";
+    import { isSynced, LyricLine } from "./lyrics";
     import getLyrics from "./lyrics";
     import { currentPlaybackPosition } from "./playback";
 
@@ -131,7 +131,7 @@
         const line = event.currentTarget;
         if (!line.id.startsWith("line-")) return;
         const index = parseInt(line.id.substring(5));
-        if (!Array.isArray(lyrics) || index < 0 || index >= lyrics.length) return;
+        if (!Array.isArray(lyrics) || index < 0 || index >= lyrics.length || !isSynced(lyrics)) return;
         const newProgress = (lyrics[index] as unknown as LyricLine)?.startTimeMs;
         dispatch("skip", newProgress);
     }
